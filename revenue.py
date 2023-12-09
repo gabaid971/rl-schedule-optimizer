@@ -10,11 +10,12 @@ class Revenue:
         self.max_connection_time = max_connection_time
 
     def calculate_feasible_connections(self):
-        flights = self.current_state
+        flights = self.current_state['time_data']
+        ways = self.current_state['way']
         connections = []
         for i in range(len(flights)):
             for j in range(len(flights)):
-                if i != j and flights[i, 2] == 0 and flights[j, 2] == 1:  
+                if i != j and ways[i] == 0 and ways[j] == 1:  
                     departure_j = flights[j, 0]
                     arrival_i = flights[i, 1]
                     cnx_time = departure_j - arrival_i
