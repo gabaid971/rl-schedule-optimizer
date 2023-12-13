@@ -19,7 +19,7 @@ class FlightSchedulingEnv(gym.Env):
         )
         self.observation_space = spaces.Dict({
             'time_data': self.observation_space,
-            'way': spaces.MultiBinary(self.number_of_flights)
+            'way': spaces.MultiBinary(self.number_of_flights),
         })
         #self.flight_schedule_minutes = flight_schedule[
         #    ['departure_minutes', 'arrival_minutes', 'way_transformed']
@@ -30,7 +30,7 @@ class FlightSchedulingEnv(gym.Env):
         self.way_transformed = flight_schedule['way_transformed']
         self.current_state = {
             'time_data': np.array(self.flight_schedule_minutes, dtype=np.int64),
-            'way': np.array(self.way_transformed, dtype=np.int8)
+            'way': np.array(self.way_transformed, dtype=np.int8),
         }       
 
         self.constraints = {i: [0, 2000] for i in range(self.number_of_flights)}
@@ -43,7 +43,7 @@ class FlightSchedulingEnv(gym.Env):
         super().reset(seed=seed)
         self.current_state = {
             'time_data': np.array(self.flight_schedule_minutes, dtype=np.int64),
-            'way': np.array(self.way_transformed, dtype=np.int8)
+            'way': np.array(self.way_transformed, dtype=np.int8),
         }   
         self.current_step = 0
         return self.current_state, {}
