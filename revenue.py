@@ -3,35 +3,39 @@ import pandas as pd
 
 
 class Revenue:
-    def __init__(self, current_state, lambdas, min_connection_time=60, max_connection_time=480):
-        self.current_state = current_state
+    def __init__(self, current, lambdas, min_connection_time=60, max_connection_time=480):
+        self.current = current
         self.lambdas = lambdas
         self.min_connection_time = min_connection_time
         self.max_connection_time = max_connection_time
 
-    def calculate_feasible_connections(self):
-        flights = self.current_state['time_data']
-        ways = self.current_state['way']
-        connections = []
-        for i in range(len(flights)):
-            for j in range(len(flights)):
-                if i != j and ways[i] == 0 and ways[j] == 1:  
-                    departure_j = flights[j, 0]
-                    arrival_i = flights[i, 1]
-                    cnx_time = departure_j - arrival_i
-                    if self.min_connection_time <= cnx_time <= self.max_connection_time:
-                        preference_value = self.preference_curve(cnx_time)
-                        lambda_value = self.lambdas[(i, j)]
-                        revenue = preference_value * lambda_value
-                        connections.append({
-                            'leg_1': i,
-                            'leg_2': j,
-                            'cnx_time': cnx_time,
-                            'preference_value' : preference_value,
-                            'lambda_value' : lambda_value,
-                            'revenue' : revenue
-                        })
-        return connections
+    def calculate_feasible_connections_old(self):
+        connections = self.current['connections']
+        connections['feasible'] = connections['cnx_time'].\
+            between(self.min_connection_time, self.max_connection_time)
+        connections['Lambda'] = connections.apply(
+            lambda x: self.lambdas[x.leg1 + x.leg2],
+            axis = 1
+        )
+        connections['preference_value'] = connections['cnx_time'].\
+            apply(self.preference_curve)
+        connections['revenue'] = connections['Lambda'] * connections['preference_value']
+        return connections 
+    
+    def calculate_revenue(self):
+        total_revenue = 0
+        connections = self.current['connections']
+        for connection in connections:
+            cnx_time = connection[4]
+            if cnx_time >= self.min_connection_time\
+                and cnx_time <= self.max_connection_time:
+                leg1 = connection[2]
+                leg2 = connection[3]
+                Lambda = self.lambdas[leg1 + leg2]
+                preference_value = self.preference_curve(cnx_time)
+                cnx_revenue = preference_value * Lambda
+                total_revenue += cnx_revenue
+        return total_revenue
 
     def preference_curve(self, x):
         if 60 <= x <= 120:
@@ -41,52 +45,9 @@ class Revenue:
         else:
             return 0
         
-    def calculate_revenue(self):
-        connections = self.calculate_feasible_connections()
-        if len(connections) > 0:
-            return sum(connection['revenue'] for connection in connections)
-        else:
-            return 0
-        
-    def calculate_feasible_connections_old(self):
-        df = self.current_state
-        departures = df[df['way'] == 1].copy()
-        arrivals = df[df['way'] == -1].copy()
-
-        feasible_connections = pd.DataFrame(columns=['departure_flight', 'arrival_flight', 'cnx_time'])
-        for i in range(len(arrivals)):
-            arrival_flight = arrivals.iloc[i]
-            
-            possible_departures = departures[
-                (departures['departure'] >= arrival_flight['arrival'] +\
-                  timedelta(minutes=self.min_connection_time)) &
-                (departures['departure'] <= arrival_flight['arrival'] +\
-                  timedelta(minutes=self.max_connection_time))
-            ]
-            for _, departure_flight in possible_departures.iterrows():
-                connection_time = departure_flight['departure'] - arrival_flight['arrival']
-                connection_info = {
-                    'departure_flight': departure_flight.name,
-                    'arrival_flight': arrival_flight.name,
-                    'cnx_time': connection_time,
-                    'cnx_time_min' : int(connection_time.total_seconds() / 60)
-                }
-                feasible_connections = pd.concat([feasible_connections, 
-                    pd.DataFrame([connection_info])], 
-                    ignore_index=True
-                )
-        return feasible_connections
-    
     def calculate_revenue_old(self):
         connections = self.calculate_feasible_connections()
         if len(connections) > 0:
-            connections['z'] = connections['cnx_time_min'].apply(lambda x : self.preference_curve(x))
-            connections['lambdas'] = connections.apply(lambda x : 
-                self.lambdas[(x.departure_flight, x.arrival_flight)], 
-                axis=1
-            )
-            connections['revenue'] = connections['z'] * connections['lambdas']
-            return connections.revenue.sum()
+            return connections['revenue'].sum()
         else:
             return 0
-        

@@ -27,17 +27,28 @@ def generate_random_flight_schedule(N):
     return random_schedule
 
 
-def generate_lambdas(df):
-    lambdas = {}
+def transform_schedule(df):
+    connections = pd.DataFrame(columns=['flight_number_1', 'flight_number_2', 'leg1', 'leg2', 'cnx_time'])
     for i, departure_flight in df[df['way'] == 1].iterrows():
         arrival_flights = df[(df['way'] == -1) & (df.index != i)]
 
         for _, arrival_flight in arrival_flights.iterrows():
-            lambdas[(arrival_flight.name, departure_flight.name)] = random.randint(0, 100)
-    return lambdas
+            departure_j = departure_flight.departure_minutes
+            arrival_i = arrival_flight.arrival_minutes
+            cnx_time = departure_j - arrival_i
+            if arrival_flight.airport != departure_flight.airport:
+                new_row = pd.DataFrame({
+                    'flight_number_1' : arrival_flight.name,
+                    'flight_number_2' : departure_flight.name,
+                    'leg1' : arrival_flight.airport, 
+                    'leg2' : departure_flight.airport,
+                    'cnx_time' : cnx_time
+                }, index = [0])
+                connections = pd.concat([new_row, connections[:]], axis= 0)
+    return connections
 
 
-def generate_lambdas_new(df):
+def generate_lambdas(df):
     lst = df.airport.unique().tolist()
     lambdas = {}
     
