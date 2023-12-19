@@ -1,7 +1,6 @@
 from gymnasium import spaces
 import gymnasium as gym
 import numpy as np
-#from sklearn.preprocessing import StandardScaler
 from revenue import Revenue
 from utils import transform_schedule
 
@@ -28,14 +27,13 @@ class FlightSchedulingEnv(gym.Env):
             low = -3000,
             high = 3000,
             shape = (len(self.connections), ),
-            dtype = np.float32
+            dtype = np.float64
         )
         self.constraints = {i: [0, 2000] for i in range(self.number_of_flights)}
 
         self.time_step = 20  
         self.max_steps = max_steps
         self.current_step = 0
-        #self.scaler = StandardScaler()
 
     def update_current(self, action):
         flight_name = action // 2
@@ -60,7 +58,6 @@ class FlightSchedulingEnv(gym.Env):
 
     def get_observations(self):
         observations = np.float32(self.current['connections'][:, 4])
-        #observations = self.scaler.transform(observations.reshape(-1, 1)).flatten()
         return observations
     
     def reset(self, seed = None, options = None):
@@ -70,7 +67,6 @@ class FlightSchedulingEnv(gym.Env):
             'connections': np.array(self.connections)
         }
         self.current_step = 0
-        #self.scaler.fit(self.get_observations().reshape(-1, 1))
         return self.get_observations(), {}
 
     def step(self, action):
