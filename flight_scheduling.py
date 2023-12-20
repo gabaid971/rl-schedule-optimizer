@@ -1,8 +1,11 @@
 from gymnasium import spaces
 import gymnasium as gym
+from matplotlib.animation import FuncAnimation
 import numpy as np
 from revenue import Revenue
 from utils import transform_schedule
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 class FlightSchedulingEnv(gym.Env):
     def __init__(self, flight_schedule, lambdas, max_steps=100, revenue_estimation='basic'):
@@ -93,3 +96,45 @@ class FlightSchedulingEnv(gym.Env):
     def respect_constraints(self, flight_number, departure_time): 
         min_departure, max_departure = self.constraints[flight_number]
         return min_departure <= departure_time <= max_departure
+    
+    def init_animation(self):
+        fig, ax = plt.subplots(figsize=(10, 5))
+        self.rectangles = []
+
+        for i in range(self.number_of_flights):
+            departure_time = self.current['flight_schedule'][i, 0]
+            arrival_time = self.current['flight_schedule'][i, 1]
+            way = self.flight_schedule['way'].iloc[i]
+            flight_name = f'{way}'
+
+            rect = patches.Rectangle((departure_time, i), arrival_time - departure_time, 0.8, edgecolor='r', facecolor='none')
+            ax.add_patch(rect)
+            ax.text(departure_time, i + 0.4, flight_name, ha='left', va='center', color='b')
+            self.rectangles.append(rect)
+
+        ax.set_xlim(0, max(self.current['flight_schedule'][:, 1]) + 100)
+        ax.set_ylim(-1, self.number_of_flights)
+        plt.xlabel('Temps (minutes)')
+        plt.ylabel('Vols')
+        plt.title('Évolution du planning de vol')
+        plt.grid(True)
+        
+        return fig, ax
+
+    def update_animation(self, frame):
+        for i in range(self.number_of_flights):
+            departure_time = self.current['flight_schedule'][i, 0]
+            arrival_time = self.current['flight_schedule'][i, 1]
+            self.rectangles[i].set_x(departure_time)
+            self.rectangles[i].set_width(arrival_time - departure_time)
+
+        return self.rectangles
+
+    def renderer(self, init=True, episode_length=100):
+        fig, ax = self.init_animation()
+        
+        if init:
+            plt.show()
+        else: 
+            animation = FuncAnimation(fig, self.update_animation, frames=episode_length, blit=True)
+            plt.show()

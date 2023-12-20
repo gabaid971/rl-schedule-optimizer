@@ -22,7 +22,6 @@ def generate_random_flight_schedule(N):
 
     random_schedule["departure_minutes"] = random_schedule.departure.dt.minute + random_schedule.departure.dt.hour * 60
     random_schedule["arrival_minutes"] = random_schedule.arrival.dt.minute + random_schedule.arrival.dt.hour * 60
-    random_schedule["way_transformed"] = random_schedule["way"].replace(-1, 0)
 
     return random_schedule
 
@@ -58,7 +57,8 @@ def generate_lambdas(df):
                 ond = ''.join(lst[i] + lst[j])
                 dno = ''.join(lst[j] + lst[i])
                 if ond not in lambdas:
-                    lambda_ = random.randint(0, 100)
+                    #lambda_ = random.randint(0, 100)
+                    lambda_ = 1000
                     lambdas[ond] = lambda_
                     lambdas[dno] = lambda_
     return lambdas
