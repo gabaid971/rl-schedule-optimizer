@@ -1,7 +1,3 @@
-from datetime import timedelta
-import pandas as pd
-
-
 class Revenue:
     def __init__(self, current, lambdas, min_connection_time=60, max_connection_time=480):
         self.current = current

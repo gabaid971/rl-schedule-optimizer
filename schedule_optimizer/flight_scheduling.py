@@ -2,8 +2,8 @@ from gymnasium import spaces
 import gymnasium as gym
 from matplotlib.animation import FuncAnimation
 import numpy as np
-from revenue import Revenue
-from utils import transform_schedule
+from schedule_optimizer.revenue import Revenue
+from schedule_optimizer.utils import transform_schedule
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
