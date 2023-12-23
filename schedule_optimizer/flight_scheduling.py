@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 class FlightSchedulingEnv(gym.Env):
-    def __init__(self, flight_schedule, lambdas, max_steps=100, revenue_estimation='basic'):
+    def __init__(self, flight_schedule, lambdas, max_steps=100, revenue_estimation='basic', obs=''):
         self.number_of_flights = len(flight_schedule)
+        self.obs = obs
         self.flight_schedule = flight_schedule
         self.lambdas = lambdas
         self.revenue_estimation = revenue_estimation
@@ -25,13 +26,21 @@ class FlightSchedulingEnv(gym.Env):
             'flight_schedule': np.array(self.flight_schedule_minutes),
             'connections': np.array(self.connections)
         }
-  
-        self.observation_space = spaces.Box(
-            low = -3000,
-            high = 3000,
-            shape = (len(self.connections), ),
-            dtype = np.float64
-        )
+        if self.obs == 'flights':
+            self.observation_space = spaces.Box(
+                low = 0,
+                high = 3000,
+                shape = (self.number_of_flights, 2),
+                dtype = np.float64
+            )
+        else:
+            self.observation_space = spaces.Box(
+                low = -3000,
+                high = 3000,
+                shape = (len(self.connections), ),
+                dtype = np.float64
+            )
+        
         self.constraints = {i: [0, 2000] for i in range(self.number_of_flights)}
 
         self.time_step = 20  
@@ -60,7 +69,10 @@ class FlightSchedulingEnv(gym.Env):
                       += sign * self.time_step
 
     def get_observations(self):
-        observations = np.float32(self.current['connections'][:, 4])
+        if self.obs == 'flights':
+            observations = np.float32(self.current['flight_schedule'])
+        else:
+            observations = np.float32(self.current['connections'][:, 4])
         return observations
     
     def reset(self, seed = None, options = None):
