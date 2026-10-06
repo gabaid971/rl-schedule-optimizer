@@ -1,79 +1,54 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "rl-schedule-optimizer"
-version = "0.1.0"
-description = "Flight scheduling optimization using reinforcement learning"
+version = "0.2.0"
+description = "Évaluation et optimisation (RL vs OR) de programmes de vols mono-hub"
 readme = "README.md"
-requires-python = ">=3.8"
-authors = [
-    {name = "Your Name", email = "your.email@example.com"}
-]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-]
-
+requires-python = ">=3.11"
+authors = [{ name = "Daniel Gabaï", email = "gabaidaniel0@gmail.com" }]
 dependencies = [
-    "numpy",
-    "polars",
-    "gymnasium",
-    "stable-baselines3",
-    "tensorboard",
-    "matplotlib",
-    "requests",
-    "importlib-metadata; python_version < '3.10'",
-    "plotly>=6.3.0",
-    "pyarrow>=17.0.0",
-    "nbformat>=5.10.4",
-    "torch-geometric>=2.6.1",
-    "torch>=2.5.1",
-    "sb3-contrib>=2.4.0",
+    "fastapi>=0.142.2",
+    "numpy>=2.0",
+    "polars>=1.0",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest",
-    "black",
-    "flake8",
-    "mypy",
-    "jupyter",
-    "ipython",
+rl = [
+    "gymnasium>=1.0",
+    "stable-baselines3>=2.4",
+    "sb3-contrib>=2.4",
+    "torch>=2.5",
+    "tensorboard",
 ]
 
-[project.urls]
-Homepage = "https://github.com/gabaid971/rl-schedule-optimizer"
-Repository = "https://github.com/gabaid971/rl-schedule-optimizer"
-Documentation = "https://github.com/gabaid971/rl-schedule-optimizer"
-Issues = "https://github.com/gabaid971/rl-schedule-optimizer/issues"
-
 [project.scripts]
-schedule-optimizer = "scripts.main:main"
+schedule-optimizer = "schedule_optimizer.cli:main"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["schedule_optimizer*", "scripts*"]
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "pytest>=8",
+    "ruff>=0.6",
+]
 
-[tool.black]
-line-length = 88
-target-version = ['py38']
+[tool.hatch.build.targets.wheel]
+packages = ["src/schedule_optimizer"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
 
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["legacy"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "NPY"]
+ignore = ["B905"]
+
+[project.urls]
+Repository = "https://github.com/gabaid971/rl-schedule-optimizer"

@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* Jetons de couleur. Séries : palette de référence data-viz (validée CVD). */
+:root {
+  color-scheme: light;
+  --page: #f6f6f4;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --sunken: #f0f0ed;
+  --ink: #141413;
+  --ink-2: #52514e;
+  --muted: #8a8983;
+  --hairline: rgba(20, 20, 19, 0.08);
+  --hairline-strong: rgba(20, 20, 19, 0.14);
+  --grid: #ebeae5;
+  --axis: #c9c8c0;
+  --series-dep: #2a78d6;
+  --series-arr: #eb6834;
+  --accent: #2a78d6;
+  --accent-wash: rgba(42, 120, 214, 0.1);
+  --good: #0ca30c;
+  --good-text: #006300;
+  --critical: #d03b3b;
+  --critical-wash: rgba(208, 59, 59, 0.08);
+  --div-mid: #f0efec;
+  --focus: rgba(42, 120, 214, 0.35);
+  --shadow-pop: 0 8px 28px rgba(20, 20, 19, 0.12), 0 1px 3px rgba(20, 20, 19, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page: #0f0f0e;
+    --surface: #181817;
+    --raised: #20201f;
+    --sunken: #252523;
+    --ink: #f4f4f2;
+    --ink-2: #c3c2b7;
+    --muted: #8a8983;
+    --hairline: rgba(255, 255, 255, 0.07);
+    --hairline-strong: rgba(255, 255, 255, 0.13);
+    --grid: #2a2a28;
+    --axis: #3d3d3a;
+    --series-dep: #3987e5;
+    --series-arr: #d95926;
+    --accent: #3987e5;
+    --accent-wash: rgba(57, 135, 229, 0.16);
+    --good-text: #2fb52f;
+    --critical-wash: rgba(208, 59, 59, 0.14);
+    --div-mid: #383835;
+    --shadow-pop: 0 8px 28px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-dep: var(--series-dep);
+  --color-arr: var(--series-arr);
+  --color-accent: var(--accent);
+  --color-accent-wash: var(--accent-wash);
+  --color-good: var(--good-text);
+  --color-critical: var(--critical);
+  --color-critical-wash: var(--critical-wash);
+  --shadow-pop: var(--shadow-pop);
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+/* KaTeX hérite de l'encre courante */
+.katex {
+  font-size: 1.05em;
+  color: var(--ink);
+}
